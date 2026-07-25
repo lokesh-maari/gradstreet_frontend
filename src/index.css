@@ -72,14 +72,14 @@ body{
 
 /* ---------- Poster ---------- */
 #poster{
-  width:1024px;
-  max-width:100%;
+  width:min(1024px,100%);
   background:#ffffff;
   position:relative;
   overflow:hidden;
   border-radius:6px;
   box-shadow:0 4px 24px rgba(0,0,0,.10);
   padding-bottom:0;
+  margin:auto;
 }
 .deco-triangle{
   position:absolute;
@@ -346,7 +346,11 @@ footer.footer-banner{
 .footer-right .fdate{font-size:12px;opacity:.85;}
 
 @media (max-width:1060px){
-  #poster{width:100%;}
+#poster{
+    width:100%;
+    border-radius:0;
+}
+
 }
 
 /* ===========================
@@ -363,19 +367,12 @@ footer.footer-banner{
 }
 
 .upload-card{
-
-    width:650px;
-
+    width:min(650px,100%);
     background:#fff;
-
     border-radius:24px;
-
     padding:50px;
-
     box-shadow:0 15px 45px rgba(0,0,0,.08);
-
     text-align:center;
-
 }
 
 .brand-logo h1{
@@ -663,4 +660,188 @@ footer.footer-banner{
     to{
         transform:rotate(360deg);
     }
+}
+
+.report-page{
+    width:100%;
+    min-height:100vh;
+    padding:24px;
+    box-sizing:border-box;
+}
+
+.report-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.poster-container{
+    display:flex;
+    justify-content:center;
+    width:100%;
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+    padding:20px 0;
+}
+
+.poster-container>*{
+    flex-shrink:0;
+}
+
+.download-section{
+    text-align:center;
+    margin-top:30px;
+}
+
+.download-buttons{
+    display:flex;
+    justify-content:center;
+    gap:16px;
+    flex-wrap:wrap;
+}
+
+.download-buttons button{
+    min-width:180px;
+    padding:14px 24px;
+    font-size:16px;
+}
+
+@media (max-width:1024px){
+
+.report-page{
+    padding:20px;
+}
+
+.report-header{
+    flex-direction:column;
+    align-items:flex-start;
+}
+
+.poster-container{
+    overflow:auto;
+}
+
+.download-buttons{
+    width:100%;
+}
+
+.download-buttons button{
+    flex:1;
+}
+
+}
+
+@media (max-width:768px){
+
+.report-page{
+    padding:15px;
+}
+
+.report-header h1{
+    font-size:28px;
+}
+
+.report-header p{
+    font-size:15px;
+}
+
+.back-btn{
+    width:100%;
+}
+
+.poster-container{
+    justify-content:flex-start;
+}
+
+.download-buttons{
+    flex-direction:column;
+}
+.download-buttons button{
+    width:100%;
+}
+.download-section h2{
+    font-size:24px;
+}
+}
+@media (max-width:480px){
+.report-page{
+    padding:10px;
+}
+.report-header h1{
+    font-size:22px;
+}
+.report-header p{
+    font-size:14px;
+}
+.download-section h2{
+    font-size:20px;
+}
+.download-buttons button{
+    font-size:15px;
+    padding:12px;
+}
+
+}
+
+@media (max-width:768px){
+#poster{
+    min-width:900px;
+}
+.poster-container{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    justify-content:flex-start;
+}
+
+}
+
+@media (max-width:600px){
+
+.upload-page{
+
+    padding:15px;
+
+}
+
+.upload-card{
+
+    padding:25px;
+
+}
+
+.title{
+
+    font-size:24px;
+
+}
+
+.subtitle{
+
+    font-size:15px;
+
+}
+
+.drop-zone{
+
+    padding:35px 20px;
+
+}
+
+.upload-icon{
+
+    font-size:48px;
+
+}
+
+.generate-btn{
+
+    height:52px;
+
+    font-size:16px;
+
+}
+
 }

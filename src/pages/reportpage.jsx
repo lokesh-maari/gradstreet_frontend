@@ -11,38 +11,61 @@ export default function ReportPage() {
   const navigate = useNavigate();
 
   async function capturePoster() {
-    return await html2canvas(posterRef.current, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: "#ffffff",
-    });
-  }
+  return await html2canvas(posterRef.current, {
+    scale: window.devicePixelRatio || 2,
+    useCORS: true,
+    allowTaint: false,
+    backgroundColor: "#ffffff",
+    logging: false,
+    imageTimeout: 0,
+    scrollX: 0,
+    scrollY: -window.scrollY,
+  });
+}
 
   async function downloadPNG() {
-    try {
-      const canvas = await capturePoster();
+  try {
+    const canvas = await capturePoster();
 
-      const link = document.createElement("a");
+    const fileName = (
+      report?.college
+        ? report.college.toUpperCase().replace(/\s+/g, "_")
+        : "REPORT"
+    );
 
-      const fileName = (
-        report?.college
-          ? report.college.toUpperCase().replace(/\s+/g, "_")
-          : "REPORT"
-      );
+    canvas.toBlob((blob) => {
+      if (!blob) return;
 
-      link.download = `${fileName}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    } catch (err) {
-      console.error(err);
-    }
+      const url = URL.createObjectURL(blob);
+
+      const isIOS =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+      if (isIOS) {
+        // Safari doesn't reliably support download attribute.
+        window.open(url, "_blank");
+      } else {
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${fileName}.png`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }
+
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }, "image/png");
+  } catch (err) {
+    console.error(err);
   }
+}
 
   async function downloadPDF() {
     try {
       const canvas = await capturePoster();
 
-      const img = canvas.toDataURL("image/png");
+      const img = canvas.toDataURL("image/jpeg", 1);
 
       const pdfWidth = 210;
 

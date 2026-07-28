@@ -1,126 +1,42 @@
 import { forwardRef } from 'react'
-import BatchTable from './BatchTable'
-import ProgressBars from './ProgressBars'
-import ScoreDistribution from './ScoreDistribution'
-import KeyHighlights from './KeyHighlights'
-import { fmtPct } from '../utils/format'
-import logo from "../assets/gradstreet_logo.png";
+import BatchWiseSummaryPoster from './BatchWiseSummaryPoster'
+import AssessmentSummaryPoster from './AssessmentSummaryPoster'
+
 // `report` is the raw JSON returned by POST /reports/generate:
-// { college, report_type, assessment_name, assessment_date, data: {...} }
+// { college, report_type, report_template, assessment_name,
+//   assessment_date, data: {...} }
+//
+// report_template tells us which poster design to render:
+//   "batch_wise_summary" -> multi-batch "Assessment N Batch-Wise
+//                            Summary Report" poster (6 KPIs, Key
+//                            Insights, badge cards)
+//   "assessment_summary" -> "{College} University Assessment-N
+//                            Report" poster (4 KPIs, Progress
+//                            column, Motivation Boost)
+//   anything else (e.g. "form_data" for a Google Form / feedback
+//                  export) -> there's no poster template for this
+//                  shape of data, so we say so instead of guessing.
 const Poster = forwardRef(function Poster({ report }, ref) {
-  const college = report?.college || 'COLLEGE'
-  const d = report?.data || {}
-  const totals = d.totals || {}
-  const batchSummary = d.batch_summary || []
-  const scoreDist = d.score_distribution || {}
-  const highlights = d.key_highlights || {}
-  const progress = d.progress_by_batch || []
+  const template = report?.report_template
+
+  if (template === 'batch_wise_summary') {
+    return <BatchWiseSummaryPoster ref={ref} report={report} />
+  }
+
+  if (template === 'assessment_summary') {
+    return <AssessmentSummaryPoster ref={ref} report={report} />
+  }
 
   return (
-    <div id="poster" ref={ref}>
-      <div className="deco-triangle"></div>
-      <div className="deco-dots">
-        {Array.from({ length: 15 }).map((_, i) => (
-          <span key={i}></span>
-        ))}
-      </div>
-
-      <header className="brand">
-        <div className="logo-mark">
-            <img src={logo} alt="GradStreet Logo" />
-        </div>
-        <div className="brand-text">
-          <div className="brand-name">GRADSTREET</div>
-          <div className="brand-tagline">YOUR PATHWAY TO CAREER SUCCESS</div>
-        </div>
-      </header>
-
-      <h1 className="college-title">{college.toUpperCase()} COLLEGE</h1>
-
-      <div className="section-heading">
-        <span className="line"></span>
-        <h2>ASSESSMENT PERFORMANCE SUMMARY</h2>
-        <span className="line"></span>
-      </div>
-
-      <div className="assessment-banner">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-          <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-          <line x1="16" y1="2" x2="16" y2="6"></line>
-          <line x1="8" y1="2" x2="8" y2="6"></line>
-          <line x1="3" y1="10" x2="21" y2="10"></line>
-        </svg>
-        <span>{(report?.assessment_name || '').toUpperCase()}</span>
-      </div>
-
-      <div className="kpi-card">
-        <div className="kpi">
-          <div className="kpi-circle" style={{ background: '#5116AE' }}>S</div>
-          <div className="kpi-value">{totals.total_students ?? '-'}</div>
-          <div className="kpi-label">Total Students</div>
-        </div>
-        <div className="kpi">
-          <div className="kpi-circle" style={{ background: '#1657E0' }}>A</div>
-          <div className="kpi-value">{totals.attempted ?? '-'}</div>
-          <div className="kpi-label">Attempted</div>
-        </div>
-        <div className="kpi">
-          <div className="kpi-circle" style={{ background: '#08A66C' }}>%</div>
-          <div className="kpi-value tag-green">{fmtPct(totals.attempt_pct)}</div>
-          <div className="kpi-label">Attempt Rate</div>
-        </div>
-        <div className="kpi">
-          <div className="kpi-circle" style={{ background: '#FE6B02' }}>Q</div>
-          <div className="kpi-value tag-orange">{totals.qualified ?? '-'}</div>
-          <div className="kpi-label">Qualified</div>
-        </div>
-      </div>
-
-      <div className="pill-heading-wrap">
-        <div className="pill-heading">BATCH-WISE PERFORMANCE</div>
-      </div>
-      <div className="panel" id="batchTablePanel">
-        <div id="batchTableWrap">
-          <BatchTable batchSummary={batchSummary} />
-        </div>
-      </div>
-
-      <ProgressBars progress={progress} />
-      <ScoreDistribution scoreDist={scoreDist} />
-
-      <div className="bottom-boxes">
-        <KeyHighlights highlights={highlights} />
-        <div className="box">
-          <div className="pill-heading" style={{ margin: '0 0 18px' }}>
-            MOTIVATION BOOST
-          </div>
-          <div className="motivation-text">
-            Every assessment is a step towards placement readiness.
-          </div>
-          <div className="motivation-cta">
-            KEEP PRACTICING.
-            <br />
-            KEEP IMPROVING.
-          </div>
-        </div>
-      </div>
-
-      <footer className="footer-banner">
-        <div className="star-circle">STAR</div>
-        <div className="footer-left">
-          STAY FOCUSED.
-          <br />
-          STAY CONSISTENT.
-          <br />
-          <span className="fy">SUCCESS IS IN PROGRESS!</span>
-        </div>
-        <div className="footer-right">
-          <div>Let us improve every batch</div>
-          <div className="fy">and achieve better scores!</div>
-          <div>{report?.assessment_name || ''}</div>
-          <div className="fdate">{report?.assessment_date || ''}</div>
-        </div>
-      </footer>
+    <div id="poster" ref={ref} className="no-poster-panel">
+      <h2>No poster available for this file</h2>
+      <p>
+        This workbook was recognized as{' '}
+        <strong>{report?.report_type || template || 'an unsupported format'}</strong>,
+        which isn&apos;t one of the two report poster designs (Batch-Wise
+        Summary Report or Assessment-N Report). Its data was still parsed
+        successfully -- check the API response for the raw fields.
+      </p>
     </div>
   )
 })

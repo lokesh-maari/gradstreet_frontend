@@ -19,3 +19,25 @@ export function toPctNumber(v) {
   if (v === null || v === undefined || Number.isNaN(v)) return 0;
   return v <= 1 ? v * 100 : v;
 }
+
+// Plain integer/number formatting with a safe fallback dash -- used for
+// KPI cards / highlight cards where a raw count (not a percentage) is shown.
+export function fmtNum(v) {
+  if (v === null || v === undefined || Number.isNaN(v)) return '-';
+  if (typeof v === 'number' && !Number.isInteger(v)) {
+    return v.toFixed(1);
+  }
+  return String(v);
+}
+
+// Looks up a batch's attempt_pct from the progress_by_batch array by name
+// (case/whitespace tolerant), returning a 0-100 number or null if not found.
+export function findBatchProgress(progressByBatch, batchName) {
+  if (!progressByBatch || !batchName) return null;
+  const target = String(batchName).trim().toLowerCase();
+  const match = progressByBatch.find(
+    (p) => String(p.batch).trim().toLowerCase() === target
+  );
+  if (!match) return null;
+  return toPctNumber(match.attempt_pct);
+}

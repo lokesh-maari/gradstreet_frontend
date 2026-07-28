@@ -1,20 +1,107 @@
-import { fmtPct, toPctNumber, bandColor } from '../utils/format'
+import { fmtPct, fmtNum, toPctNumber, bandColor, findBatchProgress } from '../utils/format'
 
-const COLS = [
+// Column presets used by the two poster templates. Backend batch_summary_df
+// rows always use these exact keys (see service.py): Batch, Total Students,
+// Attempted, Attempt %, Average %, Qualified, ">=80%", etc.
+export const ASSESSMENT_SUMMARY_COLS = [
   { key: 'Batch', label: 'Batch' },
   { key: 'Total Students', label: 'Total' },
   { key: 'Attempted', label: 'Attempted' },
   { key: 'Attempt %', label: 'Attempt %', pct: true },
-  { key: 'Avg %', label: 'Avg %', pct: true },
+  { key: 'Average %', label: 'Avg %', pct: true },
   { key: 'Qualified', label: 'Qualified' },
+  { key: '__progress__', label: 'Progress', progress: true },
 ]
 
-function TableBody({ rows, showTotalRow, totalRow }) {
+export const BATCH_WISE_SUMMARY_COLS = [
+  { key: 'Batch', label: 'Batch' },
+  { key: 'Total Students', label: 'Total' },
+  { key: 'Attempted', label: 'Attempted' },
+  { key: 'Attempt %', label: 'Attempt %', pct: true },
+  { key: 'Qualified', label: 'Qualified' },
+  { key: 'Average %', label: 'Avg %', pct: true },
+  { key: '>=80%', label: '>= 80%' },
+]
+
+// Cycling color palette used to give each batch its own colored badge in
+// the "Batch" column, matching the reference report's color-coded batch
+// pills (teal Cyber Security-1, red Cyber Security-2, purple AIML-1, ...).
+const BATCH_COLORS = [
+  '#0E8F8F', '#E63946', '#4E17A6', '#FE6B02',
+  '#1657E0', '#08A66C', '#C77F00', '#7626E5',
+  '#2B208D', '#1DA1A1',
+]
+
+function batchColor(name, index) {
+  // Stable per-name color so the same batch always gets the same color
+  // even if row order shifts between renders.
+  let hash = 0
+  const str = String(name || index)
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 31 + str.charCodeAt(i)) >>> 0
+  }
+  return BATCH_COLORS[hash % BATCH_COLORS.length]
+}
+
+function BatchBadge({ name, color }) {
+  const initial = String(name || '?').trim().charAt(0).toUpperCase() || '?'
+  return (
+    <span className="batch-badge">
+      <span className="batch-badge-dot" style={{ background: color }}>
+        {initial}
+      </span>
+      {name}
+    </span>
+  )
+}
+
+function Cell({ col, row, progressByBatch, colorizeBatch, rowIndex }) {
+  if (col.progress) {
+    const pctNum =
+      toPctNumber(row['Attempt %']) ||
+      findBatchProgress(progressByBatch, row.Batch) ||
+      0
+    return (
+      <td>
+        <div className="table-progress-track">
+          <div
+            className="table-progress-fill"
+            style={{ width: `${Math.min(pctNum, 100)}%` }}
+          />
+        </div>
+      </td>
+    )
+  }
+
+  const val = row[col.key]
+
+  if (col.key === 'Batch' && colorizeBatch) {
+    const isTotal = String(val).toUpperCase() === 'TOTAL'
+    return (
+      <td>
+        {isTotal ? val : <BatchBadge name={val} color={batchColor(val, rowIndex)} />}
+      </td>
+    )
+  }
+
+  if (col.pct) {
+    const pctNum = toPctNumber(val)
+    return (
+      <td style={{ color: bandColor(pctNum) }}>
+        {fmtPct(val)}
+      </td>
+    )
+  }
+
+  return <td>{val === null || val === undefined || val === '' ? '-' : fmtNum(val)}</td>
+}
+
+function TableBody({ rows, columns, showTotalRow, totalRow, progressByBatch, colorizeBatch, indexOffset = 0 }) {
   return (
     <table className="batch-table">
       <thead>
         <tr>
-          {COLS.map((c) => (
+          {columns.map((c) => (
             <th key={c.key}>{c.label}</th>
           ))}
         </tr>
@@ -22,26 +109,23 @@ function TableBody({ rows, showTotalRow, totalRow }) {
       <tbody>
         {rows.map((r, i) => (
           <tr key={i}>
-            {COLS.map((c) => {
-              const val = r[c.key]
-              if (c.pct) {
-                const pctNum = toPctNumber(val)
-                return (
-                  <td key={c.key} style={{ color: bandColor(pctNum) }}>
-                    {fmtPct(val)}
-                  </td>
-                )
-              }
-              return <td key={c.key}>{val ?? '-'}</td>
-            })}
+            {columns.map((c) => (
+              <Cell
+                key={c.key}
+                col={c}
+                row={r}
+                progressByBatch={progressByBatch}
+                colorizeBatch={colorizeBatch}
+                rowIndex={indexOffset + i}
+              />
+            ))}
           </tr>
         ))}
         {showTotalRow && totalRow && (
           <tr className="total-row">
-            {COLS.map((c) => {
-              const val = totalRow[c.key]
-              return <td key={c.key}>{c.pct ? fmtPct(val) : val ?? '-'}</td>
-            })}
+            {columns.map((c) => (
+              <Cell key={c.key} col={c} row={totalRow} progressByBatch={progressByBatch} colorizeBatch={colorizeBatch} rowIndex={-1} />
+            ))}
           </tr>
         )}
       </tbody>
@@ -50,22 +134,26 @@ function TableBody({ rows, showTotalRow, totalRow }) {
 }
 
 // Standalone single-row table used for the TOTAL row under a dual-table split
-function TotalOnlyTable({ totalRow }) {
+function TotalOnlyTable({ totalRow, columns, progressByBatch, colorizeBatch }) {
   return (
     <table className="batch-table">
       <tbody>
         <tr className="total-row">
-          {COLS.map((c) => {
-            const val = totalRow[c.key]
-            return <td key={c.key}>{c.pct ? fmtPct(val) : val ?? '-'}</td>
-          })}
+          {columns.map((c) => (
+            <Cell key={c.key} col={c} row={totalRow} progressByBatch={progressByBatch} colorizeBatch={colorizeBatch} rowIndex={-1} />
+          ))}
         </tr>
       </tbody>
     </table>
   )
 }
 
-export default function BatchTable({ batchSummary }) {
+export default function BatchTable({
+  batchSummary,
+  columns = ASSESSMENT_SUMMARY_COLS,
+  progressByBatch = [],
+  colorizeBatch = false,
+}) {
   const rows = (batchSummary || []).filter(
     (r) => String(r.Batch).toUpperCase() !== 'TOTAL'
   )
@@ -83,20 +171,30 @@ export default function BatchTable({ batchSummary }) {
       <>
         <div className="dual-table-wrap">
           <div>
-            <TableBody rows={left} showTotalRow={false} />
+            <TableBody rows={left} columns={columns} showTotalRow={false} progressByBatch={progressByBatch} colorizeBatch={colorizeBatch} indexOffset={0} />
           </div>
           <div>
-            <TableBody rows={right} showTotalRow={false} />
+            <TableBody rows={right} columns={columns} showTotalRow={false} progressByBatch={progressByBatch} colorizeBatch={colorizeBatch} indexOffset={mid} />
           </div>
         </div>
         {totalRow && (
           <div style={{ marginTop: 10 }}>
-            <TotalOnlyTable totalRow={totalRow} />
+            <TotalOnlyTable totalRow={totalRow} columns={columns} progressByBatch={progressByBatch} colorizeBatch={colorizeBatch} />
           </div>
         )}
       </>
     )
   }
 
-  return <TableBody rows={rows} showTotalRow={true} totalRow={totalRow} />
+  return (
+    <TableBody
+      rows={rows}
+      columns={columns}
+      showTotalRow={true}
+      totalRow={totalRow}
+      progressByBatch={progressByBatch}
+      colorizeBatch={colorizeBatch}
+      indexOffset={0}
+    />
+  )
 }

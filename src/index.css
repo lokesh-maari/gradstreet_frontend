@@ -118,32 +118,11 @@ header.brand{
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:16px;
   padding:36px 40px 6px;
 }
-.logo-mark{
-  width:64px;
-  height:64px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex:none;
-}
-
-.logo-mark img{
-  width:64px;
-  height:64px;
+.brand-logo-img{
   object-fit:contain;
-}
-.brand-text{display:flex;flex-direction:column;}
-.brand-name{
-  font-size:34px;font-weight:800;letter-spacing:3px;
-  color:var(--navy-title);
-  line-height:1.05;
-}
-.brand-tagline{
-  font-size:11px;font-weight:600;letter-spacing:3px;
-  color:#8B85A8;margin-top:2px;
+  display:block;
 }
 
 .college-title{
@@ -375,15 +354,13 @@ footer.footer-banner{
     text-align:center;
 }
 
-.brand-logo h1{
+.brand-logo{
 
-    margin:0;
+    display:flex;
 
-    color:#5B5CEB;
+    flex-direction:column;
 
-    font-size:38px;
-
-    letter-spacing:2px;
+    align-items:center;
 
 }
 
@@ -797,6 +774,276 @@ footer.footer-banner{
 }
 
 }
+
+/* ===========================
+   Inline "Progress" column bar
+   (used inside batch tables on both poster templates)
+=========================== */
+.table-progress-track{
+  width:100%;
+  min-width:70px;
+  height:12px;
+  background:var(--gray-track);
+  border-radius:8px;
+  overflow:hidden;
+}
+.table-progress-fill{
+  height:100%;
+  border-radius:8px;
+  background:linear-gradient(90deg, var(--blue), #3B82F6);
+}
+
+/* ===========================
+   Batch-Wise Summary Report poster (Template A)
+=========================== */
+.poster-a{
+  width:min(1024px,100%);
+  background:#ffffff;
+  position:relative;
+  overflow:hidden;
+  border-radius:6px;
+  box-shadow:0 4px 24px rgba(0,0,0,.10);
+  margin:auto;
+}
+
+.deco-wave{
+  position:absolute;
+  top:0;right:0;
+  width:60%;
+  max-width:520px;
+  height:150px;
+  z-index:0;
+  pointer-events:none;
+}
+.deco-wave svg{width:100%;height:100%;display:block;}
+
+.header-a{
+  position:relative;z-index:1;
+  display:flex;
+  align-items:flex-start;
+  gap:22px;
+  padding:32px 40px 18px;
+}
+
+.college-badge{
+  flex:none;
+  width:96px;
+  min-height:104px;
+  background:linear-gradient(160deg, var(--purple-primary), var(--indigo-dark));
+  border-radius:16px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  padding:12px 6px;
+  box-shadow:0 6px 16px rgba(78,23,166,.28);
+}
+.college-badge-name{
+  color:#fff;
+  font-weight:800;
+  font-size:13px;
+  text-align:center;
+  line-height:1.2;
+  word-break:break-word;
+}
+.college-badge-sub{
+  color:rgba(255,255,255,.8);
+  font-weight:700;
+  font-size:10px;
+  letter-spacing:1px;
+}
+
+.title-block{flex:1;min-width:0;padding-top:2px;}
+.title-line-0{
+  font-size:20px;
+  font-weight:800;
+  color:var(--text-dark);
+  line-height:1.2;
+  letter-spacing:.2px;
+}
+.title-line-2{
+  font-size:32px;
+  font-weight:800;
+  color:var(--purple-primary);
+  line-height:1.12;
+  margin-top:4px;
+}
+.title-underline{
+  width:70px;
+  height:4px;
+  background:var(--orange);
+  border-radius:3px;
+  margin-top:10px;
+}
+.title-sub{
+  font-size:14px;
+  color:#8B85A8;
+  font-weight:600;
+  margin-top:10px;
+}
+
+.brand-mini{flex:none;padding-top:6px;}
+
+.pill-with-icon{display:flex;align-items:center;justify-content:center;}
+
+/* ---- Highlight badge row (Scored 80%+ / Highest Avg / Highest Attempt) ---- */
+.badge-row{
+  display:flex;
+  gap:18px;
+  margin:0 40px 26px;
+}
+.badge-card{
+  flex:1;
+  min-width:0;
+  border:1px solid #EEECF5;
+  border-radius:18px;
+  box-shadow:0 4px 18px rgba(80,50,150,.06);
+  padding:24px 16px;
+  text-align:center;
+  background:#FBFAFE;
+}
+.badge-card--peach{background:#FFF4EC;border-color:#FBE3D0;}
+.badge-card--gold{background:#FFF8E8;border-color:#FBEBC0;}
+.badge-card--blue{background:#EAF6F6;border-color:#D3ECEC;}
+.badge-icon-circle{
+  width:52px;height:52px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 12px;
+}
+.badge-value{
+  font-size:26px;font-weight:800;
+}
+.badge-value-name{
+  font-size:18px;
+  line-height:1.2;
+  word-break:break-word;
+}
+.badge-label{
+  font-size:12px;font-weight:700;color:#666;
+  letter-spacing:.3px;margin-top:6px;
+}
+
+/* ---- Batch-Wise Performance table panel: header banner is attached
+       directly to the table (one solid card), not a separate pill ---- */
+.table-panel{
+  margin:0 40px 26px;
+  background:#fff;
+  border:1px solid #EEECF5;
+  border-radius:18px;
+  box-shadow:0 4px 18px rgba(80,50,150,.08);
+  overflow:hidden;
+}
+.table-panel-header{
+  background:var(--purple-primary);
+  color:#fff;
+  font-weight:700;
+  font-size:16px;
+  letter-spacing:.5px;
+  padding:16px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.table-panel-body{padding:22px 24px 26px;}
+
+/* ---- Color-coded batch name badge inside the table ---- */
+.batch-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-weight:700;
+}
+.batch-badge-dot{
+  flex:none;
+  width:20px;height:20px;border-radius:6px;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:#fff;font-size:11px;font-weight:800;
+}
+
+/* ---- Key Insights row ---- */
+.key-insights-row{
+  display:flex;
+  gap:18px;
+  margin:0 40px 30px;
+}
+.insight-card{
+  flex:1;
+  min-width:0;
+  background:#fff;
+  border:1px solid #EEECF5;
+  border-radius:18px;
+  box-shadow:0 4px 18px rgba(80,50,150,.08);
+  padding:24px 18px;
+  text-align:center;
+}
+.insight-icon-circle{
+  width:44px;height:44px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 14px;
+}
+.insight-text{
+  font-size:13.5px;
+  font-weight:600;
+  color:var(--text-dark);
+  line-height:1.5;
+}
+
+/* ---- Solid purple footer bar used on Template A ---- */
+.footer-solid{
+  margin-top:10px;
+  background:linear-gradient(100deg, var(--indigo-dark) 0%, var(--purple-primary) 100%);
+  padding:22px 40px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  flex-wrap:wrap;
+}
+.footer-solid-left{display:flex;align-items:center;}
+.footer-solid-divider{
+  flex:none;
+  width:1px;align-self:stretch;
+  background:rgba(255,255,255,.25);
+  display:none;
+}
+.footer-solid-right{
+  display:flex;align-items:center;gap:10px;
+  font-size:13px;font-weight:600;color:#fff;
+  text-align:right;
+  line-height:1.4;
+}
+
+/* Renders the logo as a clean white silhouette for dark backgrounds
+   (we only have one full-color logo asset). */
+.brand-logo-img--light{
+  filter:brightness(0) invert(1);
+}
+
+@media (max-width:768px){
+  .badge-row, .key-insights-row{flex-direction:column;}
+  .header-a{flex-wrap:wrap;}
+  .title-line-0{font-size:16px;}
+  .title-line-2{font-size:24px;}
+  .deco-wave{display:none;}
+  .footer-solid{justify-content:center;text-align:center;}
+  .footer-solid-right{text-align:center;justify-content:center;}
+}
+
+/* ===========================
+   Fallback panel for unsupported report_template
+=========================== */
+.no-poster-panel{
+  width:min(720px,100%);
+  margin:60px auto;
+  background:#fff;
+  border-radius:18px;
+  box-shadow:0 4px 24px rgba(0,0,0,.08);
+  padding:40px;
+  text-align:center;
+}
+.no-poster-panel h2{color:var(--text-dark);margin-bottom:12px;}
+.no-poster-panel p{color:#666;line-height:1.6;}
 
 @media (max-width:600px){
 

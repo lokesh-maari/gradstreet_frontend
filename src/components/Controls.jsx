@@ -1,4 +1,5 @@
 import { useState } from "react";
+import BrandLogo from "./BrandLogo";
 
 export default function Controls({
   onGenerate,
@@ -26,7 +27,7 @@ export default function Controls({
       <div className="upload-card">
 
         <div className="brand-logo">
-          <h1>GRADSTREET</h1>
+          <BrandLogo height={72} />
           <p>College Assessment Report Generator</p>
         </div>
 
